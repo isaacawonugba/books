@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+  nginx:
+    image: "bitnami/nginx:1.16"
+    depends_on:
+      - backend
+    networks:
+      - upnet
+    ports:
+      - "8088:8088"
+    volumes:
+      - ./nginx.conf:/opt/bitnami/nginx/conf/server_blocks/upstart.conf
+      - ./backend/public:/app/public:ro
+  backend:
+    image: "bitnami/php-fpm:7.4"
+    depends_on:
+      - database
+    networks:
+      - upnet
+    volumes:
+      - ./backend:/app
+  database:
+    image: "bitnami/mysql:5.7"
+    networks:
+      - upnet
+    environment:
+      - MYSQL_ROOT_USER=root
+      - MYSQL_ROOT_PASSWORD=rootpassword369
+      - MYSQL_DATABASE=upstart
+      - MYSQL_USER=upstart
+      - MYSQL_PASSWORD=upstart
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./database:/bitnami/mysql/data
+  frontend:
+    image: "bitnami/node:10"
+    depends_on:
+      - nginx
+      - backend
+    ports:
+      - "8888:8888"
+    command: "sh -c 'npm install && npm run serve'"
+    networks:
+      - upnet
+    volumes:
+      - ./frontend:/app
+
+networks:
+  upnet:
+    driver: bridge

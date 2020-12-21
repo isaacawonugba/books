@@ -1,0 +1,2 @@
+install_packages unzip git
+composer install
