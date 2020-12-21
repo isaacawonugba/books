@@ -1,1 +1,4 @@
 /database
+/.vscode
+docker-compose.yml
+nginx.conf
